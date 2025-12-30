@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joynexa – Smart Celebration Planner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f9f9f9, #e6f2ff);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      background: #4a90e2;
+      color: white;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      width: 45%;
+      margin: 15px;
+    }
+
+    h2 {
+      color: #4a90e2;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 8px 0 4px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      background: #4a90e2;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #357abd;
+    }
+
+    .results {
+      margin-top: 15px;
+      line-height: 1.6;
+    }
+
+    a {
+      display: block;
+      margin: 5px 0;
+      color: #4a90e2;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎉 Joynexa – Plan Perfect Celebrations</h1>
+    <p>Smart Gift & Venue Suggestions for Birthdays & Events</p>
+  </header>
+
+  <div class="container">
+
+    <!-- Gift Suggestions -->
+    <div class="card">
+      <h2>🎁 Gift Suggestions</h2>
+      <label>Occasion:</label>
+      <select id="occasion">
+        <option value="">-- Choose Occasion --</option>
+        <option>Birthday</option>
+        <option>Anniversary</option>
+        <option>Theatre Event</option>
+        <option>Farewell</option>
+        <option>Housewarming</option>
+        <option>Wedding</option>
+        <option>Baby Shower</option>
+        <option>Graduation</option>
+        <option>Festival</option>
+      </select>
+
+      <label>Age:</label>
+      <input type="number" id="age" placeholder="Enter age">
+
+      <label>Relation:</label>
+      <select id="relation">
+        <option value="">-- Choose Relation --</option>
+        <option>Friend</option>
+        <option>Parent</option>
+        <option>Sibling</option>
+        <option>Partner</option>
+        <option>Colleague</option>
+        <option>Other</option>
+      </select>
+
+      <label>Hobbies:</label>
+      <select id="hobbies" multiple>
+        <option>Books</option>
+        <option>Music</option>
+        <option>Travel</option>
+        <option>Sports</option>
+        <option>Cooking</option>
+        <option>Tech</option>
+        <option>Fashion</option>
+        <option>Art</option>
+      </select>
+      <small>💡 Hold CTRL (Windows) or CMD (Mac) to select multiple</small><br><br>
+
+      <button onclick="suggestGift()">Get Gift Ideas</button>
+      <div id="results" class="results"></div>
+    </div>
+
+    <!-- Venue Suggestions -->
+    <div class="card">
+      <h2>📍 Venue Suggestions Near You</h2>
+      <button onclick="getVenues()">Find Nearby Venues</button>
+      <div id="venues" class="results"></div>
+    </div>
+  </div>
+
+  <script>
+    // PRE-FILLED GIFT IDEAS
+    const giftIdeas = {
+      "Birthday": ["Cake toppers", "Headphones", "Books", "Perfume"],
+      "Anniversary": ["Photo frames", "Jewelry", "Couple watches", "Romantic dinner set"],
+      "Theatre Event": ["Movie vouchers", "Stage play tickets", "Gift cards"],
+      "Farewell": ["Personalized mugs", "Travel accessories", "Memory scrapbook"],
+      "Housewarming": ["Home décor items", "Kitchen sets", "Indoor plants", "Wall clocks"],
+      "Wedding": ["Cookware sets", "Jewelry", "Luxury bedsheets", "Cash envelopes"],
+      "Baby Shower": ["Baby clothes", "Toys", "Diaper sets", "Gift hampers"],
+      "Graduation": ["Backpacks", "Watches", "Laptops", "Books"],
+      "Festival": ["Sweets hampers", "Lights", "Clothes", "Decor items"]
+    };
+
+    const hobbyGifts = {
+      "Books": ["Novels", "Book vouchers", "E-reader"],
+      "Music": ["Headphones", "Instruments", "Vinyl records"],
+      "Travel": ["Backpacks", "Travel kits", "Luggage sets"],
+      "Sports": ["Sports shoes", "Cricket kit", "Fitness bands"],
+      "Cooking": ["Cookware sets", "Recipe books", "Kitchen appliances"],
+      "Tech": ["Smartwatch", "Bluetooth speakers", "Gadgets"],
+      "Fashion": ["Clothes", "Accessories", "Handbags"],
+      "Art": ["Paint sets", "Sketchbooks", "Craft kits"]
+    };
+
+    // 🎀 NEW: HAMPER IDEAS
+    const hamperIdeas = {
+      "Birthday": ["Chocolate hampers", "Snack hampers", "Personalized gift hampers"],
+      "Anniversary": ["Wine & cheese hampers", "Couple spa hampers", "Romantic hampers"],
+      "Theatre Event": ["Movie snack hampers", "Popcorn & drinks hampers"],
+      "Farewell": ["Memory hampers", "Travel hampers", "Office essentials hampers"],
+      "Housewarming": ["Home décor hampers", "Kitchen essentials hampers", "Plant hampers"],
+      "Wedding": ["Luxury hampers", "Jewelry hampers", "Cash & sweet hampers"],
+      "Baby Shower": ["Baby care hampers", "Diaper hampers", "Toy hampers"],
+      "Graduation": ["Study hampers", "Tech hampers", "Snack hampers"],
+      "Festival": ["Sweets hampers", "Dry fruit hampers", "Decor hampers"]
+    };
+
+    // GIFT SUGGESTIONS
+    function suggestGift() {
+      const occasion = document.getElementById('occasion').value;
+      const age = document.getElementById('age').value;
+      const relation = document.getElementById('relation').value;
+      const hobbies = Array.from(document.getElementById('hobbies').selectedOptions).map(opt => opt.value);
+
+      if (!occasion) {
+        document.getElementById('results').innerHTML = "<p style='color:red;'>⚠️ Please select an occasion.</p>";
+        return;
+      }
+
+      let ideas = giftIdeas[occasion] ? giftIdeas[occasion].join(", ") : "General gifts";
+
+      // Add hobby-based suggestions
+      let hobbySuggestions = [];
+      hobbies.forEach(h => {
+        if (hobbyGifts[h]) hobbySuggestions.push(...hobbyGifts[h]);
+      });
+
+      // Hamper suggestions
+      let hampers = hamperIdeas[occasion] ? hamperIdeas[occasion].join(", ") : "General hampers";
+
+      // Build queries
+      let searchQuery = `${occasion} ${relation} ${age} gift ${hobbies.join(" ")}`;
+      let hamperQuery = `${occasion} ${relation} ${age} gift hamper ${hobbies.join(" ")}`;
+
+      const sites = {
+        Flipkart: `https://www.flipkart.com/search?q=${encodeURIComponent(searchQuery)}`,
+        Amazon: `https://www.amazon.in/s?k=${encodeURIComponent(searchQuery)}`,
+        Meesho: `https://www.meesho.com/search?q=${encodeURIComponent(searchQuery)}`,
+        Myntra: `https://www.myntra.com/${encodeURIComponent(searchQuery)}`
+      };
+
+      const hamperSites = {
+        Flipkart: `https://www.flipkart.com/search?q=${encodeURIComponent(hamperQuery)}`,
+        Amazon: `https://www.amazon.in/s?k=${encodeURIComponent(hamperQuery)}`,
+        Meesho: `https://www.meesho.com/search?q=${encodeURIComponent(hamperQuery)}`,
+        Myntra: `https://www.myntra.com/${encodeURIComponent(hamperQuery)}`
+      };
+
+      // Build output
+      let output = `<h3>💡 Suggestions for ${occasion}:</h3>`;
+      output += `<p><b>Recommended Gifts:</b> ${ideas}</p>`;
+
+      if (hobbySuggestions.length > 0) {
+        output += `<p><b>Based on Hobbies:</b> ${hobbySuggestions.join(", ")}</p>`;
+      }
+
+      output += `<p><b>Recommended Hampers:</b> ${hampers}</p>`;  // ✅ New line
+
+      output += `<h4>🛍 Explore Gifts:</h4>`;
+      for (let site in sites) {
+        output += `<a href="${sites[site]}" target="_blank">🎁 ${site} Gift Ideas</a>`;
+      }
+
+      output += `<h4>🎀 Explore Gift Hampers:</h4>`;
+      for (let site in hamperSites) {
+        output += `<a href="${hamperSites[site]}" target="_blank">🎀 ${site} Hampers</a>`;
+      }
+
+      document.getElementById('results').innerHTML = output;
+    }
+
+    // VENUE SUGGESTIONS
+    function getVenues() {
+      const occasion = document.getElementById('occasion').value;
+
+      if (!occasion) {
+        document.getElementById('venues').innerHTML = "<p style='color:red;'>⚠️ Please select an occasion first.</p>";
+        return;
+      }
+
+      if (occasion === "Housewarming") {
+        document.getElementById('venues').innerHTML = `
+          <p>🏡 For Housewarming, usually gifts are suggested instead of venues.</p>
+          <p>🎁 Try searching for personalized home décor, kitchen sets, or house plants.</p>
+        `;
+        return;
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => showVenues(pos, occasion),
+          showError
+        );
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    function showVenues(position, occasion) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      const venueKeywords = {
+        "Birthday": "birthday party hall",
+        "Anniversary": "romantic restaurant banquet hall",
+        "Theatre Event": "theatre venue",
+        "Farewell": "farewell party hall",
+        "Wedding": "wedding hall banquet",
+        "Baby Shower": "baby shower banquet hall",
+        "Graduation": "graduation party hall",
+        "Festival": "festival celebration venue"
+      };
+
+      let keyword = venueKeywords[occasion] || "party hall";
+      const mapsLink = `https://www.google.com/maps/search/${encodeURIComponent(keyword)}+near+me/@${lat},${lon},14z`;
+
+      document.getElementById('venues').innerHTML = `
+        <p>🌍 Your Location: ${lat.toFixed(3)}, ${lon.toFixed(3)}</p>
+        <a href="${mapsLink}" target="_blank">🔎 View ${occasion} Venues on Google Maps</a>
+      `;
+    }
+
+    function showError(error) {
+      document.getElementById('venues').innerHTML = "<p style='color:red;'>❌ Unable to fetch your location.</p>";
+    }
+  </script>
+</body>
+</html>
